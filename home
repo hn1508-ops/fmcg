@@ -1,568 +1,353 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#080910"/>
-  <title>Kho Hàng</title>
-  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="PWA tra cứu sản phẩm - Dự phòng AppSheet">
+  <title>📦 Tra Cứu Hàng Hóa</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232563eb' width='192' height='192'/><text x='96' y='140' font-size='120' fill='white' text-anchor='middle'>📦</text></svg>">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #080910;
-      --s1: #0f1018;
-      --s2: #161720;
-      --s3: #1d1e2a;
-      --border: rgba(255,255,255,0.06);
-      --border2: rgba(255,255,255,0.1);
-      --gold: #f0c060;
-      --gold2: #ffd980;
-      --green: #3ddba0;
-      --red: #ff6b6b;
-      --blue: #60a8f0;
-      --purple: #a78bfa;
-      --orange: #fb923c;
-      --text: #eeeef5;
-      --sub: #7878a0;
-      --muted: #3a3a55;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      max-width: 430px;
+      padding: 16px;
+      color: #1f2937;
+    }
+    
+    .container {
+      max-width: 600px;
       margin: 0 auto;
-      overflow-x: hidden;
-      padding-bottom: 100px;
     }
-
-    /* BG ATMOSPHERE */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background:
-        radial-gradient(ellipse 90% 40% at 50% -5%, rgba(240,192,96,0.07) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 35% at 5% 60%, rgba(61,219,160,0.05) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 95% 80%, rgba(167,139,250,0.05) 0%, transparent 50%);
-      pointer-events: none;
-    }
-
-    .z1 { position: relative; z-index: 1; }
-
-    /* ── HEADER ── */
-    .header {
-      padding: 54px 22px 0;
-      display: flex; justify-content: space-between; align-items: flex-start;
-    }
-
-    .brand {
-      display: flex; flex-direction: column; gap: 2px;
-    }
-    .brand-sub {
-      font-size: 11px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--sub);
-    }
-    .brand-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 28px; font-weight: 800;
-      letter-spacing: -0.03em; line-height: 1;
-      color: var(--text);
-    }
-    .brand-name span { color: var(--gold); }
-
-    .header-right { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-
-    .notif-btn {
-      width: 38px; height: 38px;
-      background: var(--s2); border: 1px solid var(--border);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px; cursor: pointer; position: relative;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.15s;
-    }
-    .notif-btn:active { background: var(--s3); }
-    .notif-dot {
-      position: absolute; top: 7px; right: 7px;
-      width: 7px; height: 7px;
-      background: var(--red);
-      border-radius: 50%;
-      border: 1.5px solid var(--bg);
-    }
-
-    .avatar {
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--gold), var(--orange));
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Syne', sans-serif; font-weight: 800;
-      font-size: 14px; color: #1a0a00; cursor: pointer;
-    }
-
-    /* ── DATE STRIP ── */
-    .date-strip {
-      padding: 14px 22px 0;
-      font-size: 12px; color: var(--sub);
-      display: flex; align-items: center; gap: 6px;
-    }
-    .date-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* ── STATS ROW ── */
-    .stats-row {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px; padding: 18px 22px 0;
-    }
-
-    .stat {
-      background: var(--s1);
-      border: 1px solid var(--border);
-      border-radius: 16px; padding: 14px 12px;
-      position: relative; overflow: hidden;
-      animation: fadeUp 0.5s ease both;
-    }
-    .stat:nth-child(1) { animation-delay: 0.05s; }
-    .stat:nth-child(2) { animation-delay: 0.12s; }
-    .stat:nth-child(3) { animation-delay: 0.19s; }
-
-    .stat::after {
-      content: '';
-      position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
-      border-radius: 0 0 4px 4px;
-    }
-    .stat:nth-child(1)::after { background: var(--gold); }
-    .stat:nth-child(2)::after { background: var(--green); }
-    .stat:nth-child(3)::after { background: var(--red); }
-
-    .stat-val {
-      font-family: 'Syne', sans-serif;
-      font-size: 20px; font-weight: 800; line-height: 1;
-      margin-bottom: 5px;
-    }
-    .stat:nth-child(1) .stat-val { color: var(--gold); }
-    .stat:nth-child(2) .stat-val { color: var(--green); }
-    .stat:nth-child(3) .stat-val { color: var(--red); }
-    .stat-lbl { font-size: 10px; color: var(--sub); line-height: 1.4; }
-
-    /* ── SECTION HEADER ── */
-    .sec-header {
-      padding: 26px 22px 12px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .sec-title {
-      font-size: 11px; text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--sub); font-weight: 500;
-    }
-    .sec-more {
-      font-size: 11px; color: var(--gold);
-      cursor: pointer; opacity: 0.8;
-    }
-
-    /* ── MAIN MODULES ── */
-    .modules {
-      padding: 0 22px;
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .mod {
-      background: var(--s1);
-      border: 1px solid var(--border);
-      border-radius: 20px; padding: 18px 16px 16px;
-      cursor: pointer; position: relative; overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.16s, border-color 0.16s;
-      animation: fadeUp 0.5s ease both;
-    }
-    .mod:nth-child(1) { animation-delay: 0.1s; }
-    .mod:nth-child(2) { animation-delay: 0.17s; }
-    .mod:nth-child(3) { animation-delay: 0.24s; }
-    .mod:nth-child(4) { animation-delay: 0.31s; }
-    .mod:nth-child(5) { animation-delay: 0.38s; }
-    .mod:nth-child(6) { animation-delay: 0.45s; }
-
-    .mod:active { transform: scale(0.96); }
-
-    /* Glow top border per module */
-    .mod::before {
-      content: ''; position: absolute;
-      top: 0; left: 20px; right: 20px; height: 1px;
-      border-radius: 0 0 3px 3px;
-      opacity: 0.8;
-    }
-    .mod-gold::before   { background: var(--gold); }
-    .mod-green::before  { background: var(--green); }
-    .mod-red::before    { background: var(--red); }
-    .mod-blue::before   { background: var(--blue); }
-    .mod-purple::before { background: var(--purple); }
-    .mod-orange::before { background: var(--orange); }
-
-    /* Inner glow */
-    .mod::after {
-      content: ''; position: absolute; inset: 0;
-      border-radius: 20px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .mod-gold::after   { background: radial-gradient(circle at 25% 25%, rgba(240,192,96,0.06), transparent 60%); }
-    .mod-green::after  { background: radial-gradient(circle at 25% 25%, rgba(61,219,160,0.06), transparent 60%); }
-    .mod-red::after    { background: radial-gradient(circle at 25% 25%, rgba(255,107,107,0.06), transparent 60%); }
-    .mod-blue::after   { background: radial-gradient(circle at 25% 25%, rgba(96,168,240,0.06), transparent 60%); }
-    .mod-purple::after { background: radial-gradient(circle at 25% 25%, rgba(167,139,250,0.06), transparent 60%); }
-    .mod-orange::after { background: radial-gradient(circle at 25% 25%, rgba(251,146,60,0.06), transparent 60%); }
-    .mod:active::after { opacity: 1; }
-
-    .mod-icon-wrap {
-      width: 44px; height: 44px; border-radius: 13px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; margin-bottom: 14px;
-    }
-    .ic-gold   { background: rgba(240,192,96,0.1); }
-    .ic-green  { background: rgba(61,219,160,0.1); }
-    .ic-red    { background: rgba(255,107,107,0.1); }
-    .ic-blue   { background: rgba(96,168,240,0.1); }
-    .ic-purple { background: rgba(167,139,250,0.1); }
-    .ic-orange { background: rgba(251,146,60,0.1); }
-
-    .mod-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 14px; font-weight: 700;
-      color: var(--text); margin-bottom: 4px; line-height: 1.2;
-    }
-    .mod-desc {
-      font-size: 11px; color: var(--sub); line-height: 1.5;
-    }
-
-    .mod-badge {
-      position: absolute; top: 14px; right: 14px;
-      font-size: 10px; font-weight: 700;
-      font-family: 'Syne', sans-serif;
-      padding: 2px 7px; border-radius: 20px;
-    }
-    .badge-red    { background: rgba(255,107,107,0.15); color: var(--red); }
-    .badge-green  { background: rgba(61,219,160,0.15);  color: var(--green); }
-    .badge-gold   { background: rgba(240,192,96,0.15);  color: var(--gold); }
-
-    /* ── WIDE CARD (Báo cáo) ── */
-    .mod-wide {
-      grid-column: span 2;
-      display: flex; align-items: center; gap: 16px;
-      padding: 16px 18px;
-    }
-    .mod-wide .mod-icon-wrap { margin-bottom: 0; flex-shrink: 0; }
-    .mod-wide-text { flex: 1; }
-    .mod-wide .mod-name { margin-bottom: 3px; }
-
-    .report-preview {
-      display: flex; gap: 12px; margin-left: auto;
-    }
-    .rp-item { text-align: center; }
-    .rp-val {
-      font-family: 'Syne', sans-serif;
-      font-size: 14px; font-weight: 800;
-      color: var(--blue); line-height: 1;
-    }
-    .rp-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; }
-
-    /* ── ACTIVITY SECTION ── */
-    .activity { padding: 0 22px; }
-
-    .act-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 13px 0;
-      border-bottom: 1px solid var(--border);
-      animation: fadeUp 0.5s ease both;
-    }
-    .act-item:nth-child(1) { animation-delay: 0.15s; }
-    .act-item:nth-child(2) { animation-delay: 0.22s; }
-    .act-item:nth-child(3) { animation-delay: 0.29s; }
-    .act-item:last-child { border-bottom: none; }
-
-    .act-icon {
-      width: 36px; height: 36px; border-radius: 11px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; flex-shrink: 0;
-    }
-
-    .act-info { flex: 1; min-width: 0; }
-    .act-name {
-      font-size: 13px; font-weight: 500; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin-bottom: 2px;
-    }
-    .act-meta { font-size: 11px; color: var(--sub); }
-
-    .act-qty {
-      font-family: 'Syne', sans-serif;
-      font-size: 13px; font-weight: 700; flex-shrink: 0;
-    }
-
-    /* ── BOTTOM NAV ── */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 430px;
-      background: rgba(8,9,16,0.88);
-      backdrop-filter: blur(20px) saturate(1.5);
-      -webkit-backdrop-filter: blur(20px) saturate(1.5);
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center;
-      padding: 10px 8px 28px;
-      z-index: 200;
-    }
-
-    .nav-item {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 4px;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-      transition: opacity 0.15s; padding: 4px 0;
-    }
-    .nav-item:active { opacity: 0.5; }
-
-    .nav-icon-wrap {
-      width: 40px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 10px; font-size: 20px;
-      transition: background 0.2s;
-    }
-    .nav-item.active .nav-icon-wrap {
-      background: rgba(240,192,96,0.12);
-    }
-
-    .nav-lbl {
-      font-size: 10px; color: var(--sub);
-      letter-spacing: 0.02em;
-    }
-    .nav-item.active .nav-lbl { color: var(--gold); font-weight: 500; }
-
-    /* FAB */
-    .nav-fab {
-      flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 4px;
-    }
-    .fab-btn {
-      width: 50px; height: 50px;
-      background: linear-gradient(135deg, var(--gold), var(--orange));
+    
+    header {
+      background: white;
       border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(240,192,96,0.35);
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.15s, box-shadow 0.15s;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    .fab-btn:active {
-      transform: scale(0.92);
-      box-shadow: 0 2px 10px rgba(240,192,96,0.2);
+    
+    header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
     }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
+    
+    .status {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    
+    .status.online::before {
+      content: "🟢 ";
+    }
+    
+    .status.offline::before {
+      content: "🔴 ";
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: #10b981;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #059669;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: white;
+      padding: 8px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .tab-btn {
+      flex: 1;
+padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #f3f4f6;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn.active {
+      background: #2563eb;
+      color: white;
+    }
+    
+    .results {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .result-item {
+      padding: 12px;
+      border-left: 4px solid #2563eb;
+      margin-bottom: 8px;
+      background: #f9fafb;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .result-item:hover {
+      background: #f3f4f6;
+      transform: translateX(4px);
+    }
+    
+    .product-name {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 4px;
+      color: #1f2937;
+    }
+    
+    .product-code {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .product-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 14px;
+    }
+    
+    .detail {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .detail-label {
+      color: #6b7280;
+      font-weight: 600;
+    }
+    
+    .detail-value {
+      color: #1f2937;
+      font-weight: 700;
+    }
+    
+    .price {
+      color: #059669;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      border: 3px solid #e5e7eb;
+      border-top: 3px solid #2563eb;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border-left: 4px solid #dc2626;
+    }
+    
+    .success {
+      background: #dcfce7;
+      color: #166534;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border-left: 4px solid #16a34a;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
     }
   </style>
 </head>
 <body>
-<div class="z1">
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="brand">
-      <div class="brand-sub">Hệ thống</div>
-      <div class="brand-name">Kho <span>Gold</span></div>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>📦 Tra Cứu Hàng Hóa</h1>
+      <div id="status" class="status offline">Offline</div>
+    </header>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('search')">🔍 Tra Cứu</button>
+      <button class="tab-btn" onclick="switchTab('scan')">📱 Scan</button>
+      <button class="tab-btn" onclick="switchTab('settings')">⚙️ Cài Đặt</button>
     </div>
-    <div class="header-right">
-      <div class="notif-btn">
-        🔔
-        <div class="notif-dot"></div>
-      </div>
-      <div class="avatar">KH</div>
-    </div>
-  </div>
-
-  <!-- DATE -->
-  <div class="date-strip">
-    <div class="date-dot"></div>
-    <span id="today-date">Đang tải...</span>
-    · Dữ liệu cập nhật lúc 06:00
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-val">1,284</div>
-      <div class="stat-lbl">Tổng SKU</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val">38</div>
-      <div class="stat-lbl">Nhập hôm nay</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val">12</div>
-      <div class="stat-lbl">Cần xử lý</div>
-    </div>
-  </div>
-
-  <!-- MODULES -->
-  <div class="sec-header">
-    <div class="sec-title">Chức năng</div>
-  </div>
-
-  <div class="modules">
-
-    <!-- Tồn Giá -->
-    <div class="mod mod-gold" onclick="navigate('ton-gia')">
-      <div class="mod-icon-wrap ic-gold">📦</div>
-      <div class="mod-name">Tồn Giá</div>
-      <div class="mod-desc">Tra cứu tồn kho & giá bán</div>
-    </div>
-
-    <!-- Nhập Kho -->
-    <div class="mod mod-green" onclick="navigate('nhap-kho')">
-      <div class="mod-badge badge-green">+38</div>
-      <div class="mod-icon-wrap ic-green">📥</div>
-      <div class="mod-name">Nhập Kho</div>
-      <div class="mod-desc">Ghi nhận hàng nhập mới</div>
-    </div>
-
-    <!-- Xuất Kho -->
-    <div class="mod mod-orange" onclick="navigate('xuat-kho')">
-      <div class="mod-icon-wrap ic-orange">📤</div>
-      <div class="mod-name">Xuất Kho</div>
-      <div class="mod-desc">Ghi nhận hàng xuất đi</div>
-    </div>
-
-    <!-- Cảnh Báo -->
-    <div class="mod mod-red" onclick="navigate('canh-bao')">
-      <div class="mod-badge badge-red">12</div>
-      <div class="mod-icon-wrap ic-red">⚠️</div>
-      <div class="mod-name">Cảnh Báo</div>
-      <div class="mod-desc">Hàng sắp hết & quá hạn</div>
-    </div>
-
-    <!-- Báo Cáo — wide -->
-    <div class="mod mod-blue mod-wide" onclick="navigate('bao-cao')">
-      <div class="mod-icon-wrap ic-blue">📊</div>
-      <div class="mod-wide-text">
-        <div class="mod-name">Báo Cáo</div>
-        <div class="mod-desc">Thống kê nhập xuất tồn</div>
-      </div>
-      <div class="report-preview">
-        <div class="rp-item">
-          <div class="rp-val">↑38</div>
-          <div class="rp-lbl">Nhập</div>
+    
+    <!-- Tab: Tra Cứu -->
+    <div id="search-tab" class="tab-content">
+<div style="margin-bottom: 16px;">
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Nhập barcode hoặc tên sản phẩm..."
+            onkeypress="handleEnter(event)"
+          >
+          <button class="btn-primary" onclick="search()">🔍</button>
         </div>
-        <div class="rp-item">
-          <div class="rp-val" style="color:var(--orange)">↓24</div>
-          <div class="rp-lbl">Xuất</div>
+        <button class="btn-secondary" style="width: 100%;" onclick="loadAll()">Tải Tất Cả</button>
+      </div>
+      <div id="results" class="results">
+        <div class="empty-state">👇 Nhập để tìm kiếm</div>
+      </div>
+    </div>
+    
+    <!-- Tab: Scan -->
+    <div id="scan-tab" class="tab-content" style="display: none;">
+      <div style="margin-bottom: 16px;">
+        <button class="btn-primary" style="width: 100%;" onclick="startCamera()">🎥 Mở Camera</button>
+      </div>
+      <div id="camera-container" style="display: none; margin-bottom: 16px;">
+        <video id="video" style="width: 100%; border-radius: 12px; margin-bottom: 8px;"></video>
+        <button class="btn-danger" style="width: 100%;" onclick="stopCamera()">❌ Đóng Camera</button>
+      </div>
+      <div id="scan-results" class="results">
+        <div class="empty-state">Quét barcode để bắt đầu</div>
+      </div>
+    </div>
+    
+    <!-- Tab: Settings -->
+    <div id="settings-tab" class="tab-content" style="display: none;">
+      <div class="results">
+        <h3 style="margin-bottom: 16px;">Cấu Hình</h3>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+            Apps Script URL:
+          </label>
+          <input 
+            type="text" 
+            id="apiUrl" 
+            placeholder="https://script.google.com/macros/d/..."
+            style="width: 100%;"
+          >
         </div>
+        <button class="btn-primary" style="width: 100%;" onclick="saveSettings()">💾 Lưu</button>
+        
+        <h3 style="margin-top: 24px; margin-bottom: 16px;">Dữ Liệu</h3>
+        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="syncData()">
+          🔄 Đồng Bộ Dữ Liệu
+        </button>
+        <button class="btn-danger" style="width: 100%;" onclick="clearCache()">🗑️ Xóa Cache</button>
+        
+        <div id="sync-status" style="margin-top: 16px; font-size: 12px; color: #6b7280;"></div>
       </div>
     </div>
-
   </div>
 
-  <!-- ACTIVITY -->
-  <div class="sec-header">
-    <div class="sec-title">Hoạt động gần đây</div>
-    <div class="sec-more">Xem tất cả</div>
-  </div>
-
-  <div class="activity">
-
-    <div class="act-item">
-      <div class="act-icon ic-green">📥</div>
-      <div class="act-info">
-        <div class="act-name">Nhập — Sữa Ensure Gold 850g</div>
-        <div class="act-meta">Hôm nay · 09:14</div>
-      </div>
-      <div class="act-qty" style="color:var(--green)">+200</div>
-    </div>
-
-    <div class="act-item">
-      <div class="act-icon ic-orange">📤</div>
-      <div class="act-info">
-        <div class="act-name">Xuất — Bột giặt OMO 3kg</div>
-        <div class="act-meta">Hôm nay · 08:45</div>
-      </div>
-      <div class="act-qty" style="color:var(--orange)">−50</div>
-    </div>
-
-    <div class="act-item">
-      <div class="act-icon ic-red">⚠️</div>
-      <div class="act-info">
-        <div class="act-name">Cảnh báo — Dầu Olive Bertolli</div>
-        <div class="act-meta">Hôm nay · 06:01 · Tồn thấp</div>
-      </div>
-      <div class="act-qty" style="color:var(--red)">8</div>
-    </div>
-
-  </div>
-
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item active">
-    <div class="nav-icon-wrap">🏠</div>
-    <div class="nav-lbl">Trang chủ</div>
-  </div>
-  <div class="nav-item">
-    <div class="nav-icon-wrap">📋</div>
-    <div class="nav-lbl">Danh sách</div>
-  </div>
-  <div class="nav-fab">
-    <div class="fab-btn" onclick="navigate('nhap-kho')">＋</div>
-  </div>
-  <div class="nav-item">
-    <div class="nav-icon-wrap">📊</div>
-    <div class="nav-lbl">Báo cáo</div>
-  </div>
-  <div class="nav-item">
-    <div class="nav-icon-wrap">👤</div>
-    <div class="nav-lbl">Tài khoản</div>
-  </div>
-</div>
-
-<script>
-  // Hiển thị ngày hôm nay
-  const days = ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
-  const now = new Date();
-  document.getElementById('today-date').textContent =
-    `${days[now.getDay()]}, ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
-
-  // Điều hướng (placeholder — sẽ mở file module tương ứng)
-  function navigate(module) {
-    const map = {
-      'ton-gia':   'ton-gia.html',
-      'nhap-kho':  'nhap-kho.html',
-      'xuat-kho':  'xuat-kho.html',
-      'canh-bao':  'canh-bao.html',
-      'bao-cao':   'bao-cao.html',
-    };
-    if (map[module]) {
-      // window.location.href = map[module]; // bật khi có file thật
-      alert(`→ Mở module: ${module}\n(Sẽ điều hướng đến ${map[module]} khi deploy)`);
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => 
+        console.log('SW registration failed:', err)
+      );
     }
-  }
-
-  // Nav bottom active state
-  document.querySelectorAll('.nav-item').forEach((item, i) => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      item.classList.add('active');
-    });
-  });
-</script>
+    
+    // Check online status
+    window.addEventListener('online', () => updateStatus(true));
+window.addEventListener('offline', () => updateStatus(false));
+    updateStatus(navigator.onLine);
+  </script>
 </body>
 </html>
